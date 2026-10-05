@@ -8,6 +8,6 @@ describe('wrong-keyboard rescue', () => {
     expect(fixKeyboard('hi')).toBeNull();
   });
   it('rejects common English words that map to junk', () => {
-    for (const w of ['hello', 'dog', 'the']) expect(fixKeyboard(w), w).toBeNull();
+    for (const w of ['hello', 'dog', 'the', 'test']) expect(fixKeyboard(w), w).toBeNull();
   });
 });

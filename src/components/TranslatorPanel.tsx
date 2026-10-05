@@ -33,7 +33,7 @@ export function TranslatorPanel() {
   const result = useMemo(() => translate(debounced, dir, edited ?? undefined), [debounced, dir, edited]);
   const output = result.output;
   const hasOutput = output.trim().length > 0;
-  const noThai = debounced.trim().length > 0 && !/[ก-๛]/.test(debounced);
+  const noThai = debounced.trim().length > 0 && !/[ก-๛]/.test(debounced) && /[A-Za-z]/.test(debounced);
   const kbFix = noThai ? fixKeyboard(debounced) : null;
 
   useEffect(() => {
