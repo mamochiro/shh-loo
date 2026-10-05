@@ -20,6 +20,7 @@ export function translate(text: string, dir: Direction, segs?: Seg[]): Translate
 
 export { segment, syllabify, mergeSegs, splitSeg, splitPoints, type Seg } from './segment';
 export { toLoo } from './encode';
+export { fixKeyboard } from './keyboard';
 export { fromPair } from './decode';
 export { parseSyllable } from './parse';
 export { classOf, spokenTone } from './tone';

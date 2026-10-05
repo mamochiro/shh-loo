@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Copy, Share2, Volume2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { translate, type Direction, type Seg } from '@/lib/pasaloo';
+import { fixKeyboard, translate, type Direction, type Seg } from '@/lib/pasaloo';
 import { copyText } from '@/lib/browser';
 import { useHistory, type HistoryItem } from '@/hooks/useHistory';
 import { useSpeech } from '@/hooks/useSpeech';
@@ -33,6 +33,8 @@ export function TranslatorPanel() {
   const result = useMemo(() => translate(debounced, dir, edited ?? undefined), [debounced, dir, edited]);
   const output = result.output;
   const hasOutput = output.trim().length > 0;
+  const noThai = debounced.trim().length > 0 && !/[ก-๛]/.test(debounced);
+  const kbFix = noThai ? fixKeyboard(debounced) : null;
 
   useEffect(() => {
     const id = window.setTimeout(() => setDebounced(text), DEBOUNCE_MS);
@@ -90,7 +92,7 @@ export function TranslatorPanel() {
       size="icon"
       aria-label={speech.supported ? label : `${label} — ${t('speech_off')}`}
       title={speech.supported ? label : t('speech_off')}
-      disabled={!speech.supported}
+      disabled={!speech.supported || !/[ก-๛]/.test(value)}
       onClick={() => speech.speak(value)}
     >
       <Volume2 aria-hidden />
@@ -141,6 +143,20 @@ export function TranslatorPanel() {
               {hasOutput ? output : t('out_empty')}
             </output>
           </div>
+          {noThai && (
+            <p className="hint" role="status">
+              {t('no_thai')}
+              {kbFix && (
+                <>
+                  {' '}
+                  {t('kb_suggest')}
+                  <button type="button" className="underline font-semibold" onClick={() => setInput(kbFix)}>
+                    {kbFix}
+                  </button>
+                </>
+              )}
+            </p>
+          )}
           <div className="row-end">
             {speakBtn(t('listen_out'), output)}
             <Button variant="ghost" onClick={share}>
