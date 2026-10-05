@@ -2,6 +2,7 @@
 import { MotionConfig } from 'motion/react';
 import { ThemeProvider } from 'next-themes';
 import { I18nProvider } from '@/components/I18nProvider';
+import { RegisterSW } from '@/components/RegisterSW';
 import { Toaster } from '@/components/ui/sonner';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <I18nProvider>
           {children}
           <Toaster />
+          <RegisterSW />
         </I18nProvider>
       </MotionConfig>
     </ThemeProvider>

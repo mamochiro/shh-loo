@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: 'ภาษาลู Translator',
   description: 'แปลภาษาไทยเป็นภาษาลู และแปลกลับ แบบสด ๆ ขณะพิมพ์ — Thai ⇄ Pasa Loo, live as you type.',
   icons: { icon: '/favicon.svg' },
+  appleWebApp: { capable: true, title: 'shh-loo', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {

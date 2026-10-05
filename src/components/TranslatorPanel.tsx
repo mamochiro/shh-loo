@@ -5,6 +5,7 @@ import { Copy, Share2, Volume2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { fixKeyboard, translate, type Direction, type Seg } from '@/lib/pasaloo';
 import { copyText } from '@/lib/browser';
+import { renderShareCard } from '@/lib/shareCard';
 import { useHistory, type HistoryItem } from '@/hooks/useHistory';
 import { useSpeech } from '@/hooks/useSpeech';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,9 @@ export function TranslatorPanel() {
     setEdited(null);
   };
 
+  const srcLabel = t(th2loo ? 'src_th' : 'src_loo');
+  const dstLabel = t(th2loo ? 'src_loo' : 'src_th');
+
   const swap = () => setInput(translate(text, dir, edited ?? undefined).output, th2loo ? 'loo2th' : 'th2loo');
 
   const copy = async () => {
@@ -74,6 +78,17 @@ export function TranslatorPanel() {
     if (!hasOutput) return toast.message(t('t_no_share'));
     pushHistory();
     const url = `${location.origin}${location.pathname}?${new URLSearchParams({ t: text.trim(), d: dir })}`;
+    // preferred: a picture card through the native share sheet (LINE, IG, TikTok …)
+    try {
+      const blob = await renderShareCard({ src: text.trim(), out: output.trim(), srcLabel, dstLabel });
+      const file = new File([blob], 'shh-loo.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text: `${output.trim()}\n${url}` });
+        return;
+      }
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') return;
+    }
     if (typeof navigator.share === 'function') {
       try {
         await navigator.share({ title: 'ภาษาลู Translator', text: output, url });
@@ -99,8 +114,6 @@ export function TranslatorPanel() {
     </Button>
   );
 
-  const srcLabel = t(th2loo ? 'src_th' : 'src_loo');
-  const dstLabel = t(th2loo ? 'src_loo' : 'src_th');
   const restore = (h: HistoryItem) => setInput(h.src, h.dir);
 
   return (
