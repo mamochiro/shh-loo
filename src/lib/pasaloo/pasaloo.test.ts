@@ -108,6 +108,20 @@ describe('ภาษาลู → Thai (decode(encode(x)) === x)', () => {
   });
 });
 
+describe('hidden-vowel words', () => {
+  it.each([
+    ['สวัสดี', 'หละสุหลัดหวุดลีดู'],
+    ['สนุก', 'หละสุหลุกหนุก'],
+    ['อร่อย', 'หละอุหล่อยหรู่ย'],
+    ['ขนม', 'หละขุหลมหนุม'],
+  ])('%s → %s', (thai, loo) => {
+    const r = translate(thai, 'th2loo');
+    expect(r.output).toBe(loo);
+    expect(r.syllables.some((s) => s.uncertain)).toBe(false);
+  });
+  it('decodes to the phonetic spelling', () => expect(dec('หละสุหลัดหวุดลีดู')).toBe('สะหวัดดี'));
+});
+
 describe('syllabify / segmentation', () => {
   it('splits common words', () => {
     expect(syllabify('กินข้าวหรือยัง')).toEqual(['กิน', 'ข้าว', 'หรือ', 'ยัง']);
@@ -120,8 +134,8 @@ describe('syllabify / segmentation', () => {
       { text: 'กิน', uncertain: false },
       { text: 'ข้าว', uncertain: false },
     ]);
-    // hidden vowel: สวัสดี is split ส|วัส|ดี, and the bare ส is flagged
-    expect(translate('สวัสดี', 'th2loo').syllables.some((s) => s.uncertain)).toBe(true);
+    // hidden vowel not in the list: ขนุน is split ข|นุน, and the bare ข is flagged
+    expect(translate('ขนุน', 'th2loo').syllables.some((s) => s.uncertain)).toBe(true);
   });
 });
 

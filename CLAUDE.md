@@ -31,7 +31,7 @@ Per syllable:
 
 ## Known limitations
 
-- Syllable splitting is rule-based; hidden-vowel words (สวัสดี, ขนม) can split wrong. Syllables the splitter is unsure about are flagged `uncertain`; users fix splits via the chips.
+- Syllable splitting is rule-based. Common hidden-vowel words (สวัสดี, สนุก, ขนม …) live in `src/lib/pasaloo/hidden.ts` as typed word → pronounced syllables (one line to add a word); decoding those gives the phonetic spelling back. Words not in the list can still split wrong: the splitter flags them `uncertain` and users fix splits via the chips.
 - Speech uses the device's Thai voice; some desktops have none.
 
 ## Conventions

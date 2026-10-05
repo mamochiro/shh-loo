@@ -1,4 +1,5 @@
 /** Text → segments: normalize, Thai word boundaries via Intl.Segmenter, then rule-based syllable splitting. */
+import { HIDDEN } from './hidden';
 import { KARAN, clusterAt, isAttached, isConsonant, isLeadVowel, isTone, isVowelMark } from './parse';
 
 export interface Seg {
@@ -104,7 +105,7 @@ export function segment(text: string, useWords = true): Seg[] {
     run++;
     for (const piece of m[0].split('-')) {
       for (const w of useWords ? words(piece) : [piece]) {
-        for (const syl of syllabify(w, !useWords)) segs.push({ s: syl, th: true, run });
+        for (const syl of (useWords && HIDDEN[w]) || syllabify(w, !useWords)) segs.push({ s: syl, th: true, run });
       }
     }
     last = idx + m[0].length;
