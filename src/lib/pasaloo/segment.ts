@@ -22,7 +22,7 @@ function startsNext(s: string, i: number): boolean {
 }
 
 /** Rule-based split of a run of Thai characters into syllables. */
-export function syllabify(s: string, loo = false): string[] {
+export function syllabify(s: string, loo = false, start = 0): string[] {
   const out: string[] = [];
   const n = s.length;
   let i = 0;
@@ -37,9 +37,12 @@ export function syllabify(s: string, loo = false): string[] {
       continue;
     }
     const ini = i;
-    // ภาษาลู side: a part 1 starting with ซ is always followed by a part 2 starting with ร / ล / หร / หล,
-    // so ซูก|ลีก must not be read as ซู|กลีก
-    const zi = loo && s[ini] === 'ซ';
+    // ภาษาลู side: syllables alternate part 1 / part 2 (`start` = syllables already read in this run).
+    //  - part 1 starting with ซ is followed by a part 2 starting with ร / ล / หร / หล  (ซูก|ลีก, not ซู|กลีก)
+    //  - part 2 is followed by a part 1, which always starts with ล / ซ / หล          (ขูบ|ลุณ, not ขู|บลุณ)
+    const part1 = (start + out.length) % 2 === 0;
+    const zi = loo && part1 && s[ini] === 'ซ';
+    const afterPart2 = loo && !part1;
     i++;
     if (clusterAt(s, ini, lead)) i++;
     let vm = '';
@@ -56,7 +59,11 @@ export function syllabify(s: string, loo = false): string[] {
         vm += c; i++; continue;
       }
       const needFin = !fin && /[ั็]$/.test(vm);
-      const loosePart2 = zi && !fin && c !== 'ล' && c !== 'ร' && !(c === 'ห' && (s[i + 1] === 'ล' || s[i + 1] === 'ร'));
+      const hl = c === 'ห' && s[i + 1] === 'ล';
+      if (afterPart2 && hl) break; // ห is never a final: this is the หล of the next part 1
+      const loosePart2 =
+        !fin && ((zi && c !== 'ล' && c !== 'ร' && !(c === 'ห' && (s[i + 1] === 'ล' || s[i + 1] === 'ร'))) ||
+                 (afterPart2 && c !== 'ล' && c !== 'ซ' && !hl));
       if (needFin ? isAttached(s[i + 1]) && s[i + 1] !== KARAN : startsNext(s, i) && !loosePart2) break;
       if (fin) break;
       if (c === 'ย' && lead === 'เ' && vm.includes('ี') && !vm.includes('ย')) { vm += c; i++; continue; }
@@ -103,9 +110,13 @@ export function segment(text: string, useWords = true): Seg[] {
     const idx = m.index ?? 0;
     if (idx > last) segs.push({ s: text.slice(last, idx), th: false, run: -1 });
     run++;
+    let n = 0; // syllables so far in this run
     for (const piece of m[0].split('-')) {
       for (const w of useWords ? words(piece) : [piece]) {
-        for (const syl of (useWords && HIDDEN[w]) || syllabify(w, !useWords)) segs.push({ s: syl, th: true, run });
+        for (const syl of (useWords && HIDDEN[w]) || syllabify(w, !useWords, n)) {
+          n++;
+          segs.push({ s: syl, th: true, run });
+        }
       }
     }
     last = idx + m[0].length;

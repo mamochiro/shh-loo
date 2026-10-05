@@ -114,6 +114,19 @@ describe('ภาษาลู → Thai (decode(encode(x)) === x)', () => {
   });
 });
 
+describe('strict decoding', () => {
+  it('converts only pairs that follow the rules', () => {
+    expect(dec('ลินกุนซูรี')).toBe('กินรู');
+    expect(dec('ลินกุนลูรู')).toBe('กินลูรู'); // ลู+รู is not a valid pair (รู → ซูรี): left as typed
+    expect(dec('ลินกุน')).toBe('กิน');
+    expect(dec('ลิน')).toBe('ลิน'); // odd leftover
+  });
+  it('accepts hand-written tone marks (ignored when validating)', () => {
+    expect(dec('ล้าวขู้ว')).toBe('ข้าว');
+    expect(dec('ล่าวขู้ว')).toBe('ข้าว');
+  });
+});
+
 describe('hidden-vowel words', () => {
   it.each([
     ['สวัสดี', 'หละสุหลัดหวุดลีดู'],
