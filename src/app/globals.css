@@ -259,13 +259,21 @@
   .mascot { width: 56px; height: 56px; }
   .header-r { width: 100%; }
   .tabs { flex: 1 1 auto; }
-  .tab { flex: 1 1 0; padding: 0 6px; font-size: 14px; }
+  .header-r { gap: 6px; }
+  .tabs { min-width: 0; }
+  .tab { flex: 1 1 0; min-width: 0; padding: 0 4px; font-size: 13px; white-space: nowrap; }
+  .lang-short { display: none; }
+  .levels { border-radius: 24px; }
+  .level { height: auto; min-height: 44px; padding: 6px 8px; font-size: 13px; line-height: 1.25; }
   .card { padding: 18px; border-radius: 24px; }
   .out { font-size: 20px; }
   .out-box { min-height: 120px; }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .word { font-size: 34px; }
   .practice { padding: 20px; }
+  .example { gap: 8px 10px; }
+  .example > svg { display: none; }
+  .example-word { min-width: 64px; }
   .actions > button { flex: 1 1 auto; }
   .actions > .spacer { display: none; }
 }

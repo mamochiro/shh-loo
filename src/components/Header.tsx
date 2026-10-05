@@ -42,7 +42,7 @@ export function Header() {
           aria-label={t('lang_toggle')}
           onClick={() => setLang(lang === 'th' ? 'en' : 'th')}
         >
-          <Languages aria-hidden /> {t('lang_short')}
+          <Languages aria-hidden /> <span className="lang-short">{t('lang_short')}</span>
         </Button>
         <ThemeToggle />
       </div>
