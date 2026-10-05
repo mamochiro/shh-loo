@@ -5,11 +5,11 @@ Next.js (App Router, static export) + TypeScript strict + Tailwind v4 + shadcn/u
 
 ## Commands
 
-- `npm install`
-- `npm run dev` — dev server (http://localhost:3000)
-- `npm test` — Vitest engine tests (must stay green)
-- `npm run typecheck`
-- `npm run build` — static export to `out/`
+- `bun install`
+- `bun run dev` — dev server (http://localhost:3000)
+- `bun run test` (not `bun test`, which is Bun's own runner) — Vitest engine tests (must stay green)
+- `bun run typecheck`
+- `bun run build` — static export to `out/`
 
 ## Where things live
 

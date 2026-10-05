@@ -5,11 +5,11 @@ Thai ⇄ ภาษาลู (Pasa Loo), live as you type. Next.js (App Router) +
 ## Setup
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000
-npm test           # Vitest — engine unit tests
-npm run typecheck  # tsc --noEmit
-npm run build      # static export → out/
+bun install
+bun run dev        # http://localhost:3000
+bun run test         # Vitest — engine unit tests
+bun run typecheck  # tsc --noEmit
+bun run build      # static export → out/
 ```
 
 Stack: Next.js · Tailwind CSS v4 · shadcn/ui pattern (Radix + cva) · `next/font` (Prompt for headings, Noto Sans Thai for body) · next-themes · Motion · Sonner · lucide-react · Vitest. No backend, no external APIs.
@@ -52,7 +52,7 @@ src/hooks/          useHistory, useSpeech
 The app is a static export (`output: 'export'`), so no server or environment variables are needed.
 
 1. Push the repo to GitHub.
-2. On [vercel.com/new](https://vercel.com/new), import the repository. The Framework Preset is detected as **Next.js**; keep the defaults (Build: `npm run build`).
+2. On [vercel.com/new](https://vercel.com/new), import the repository. The Framework Preset is detected as **Next.js**; keep the defaults (Build: `bun run build`).
 3. Click **Deploy**. Every push to `main` redeploys; pull requests get preview URLs.
 
 Or with the CLI: `npx vercel` (preview) / `npx vercel --prod`.
