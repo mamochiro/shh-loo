@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/components/History.tsx","./src/components/HowItWorks.tsx","./src/components/Icons.tsx","./src/components/Mascot.tsx","./src/components/Practice.tsx","./src/components/SyllableChips.tsx","./src/data/words.ts","./src/lib/browser.ts","./src/lib/pasaloo.test.ts","./src/lib/pasaloo.ts","./vite.config.ts"],"version":"5.6.3"}

@@ -1,5 +1,9 @@
 node_modules
-dist
+.next
+out
 .vercel
 .DS_Store
 *.log
+next-env.d.ts
+tsconfig.tsbuildinfo
+.vitest

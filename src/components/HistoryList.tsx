@@ -1,11 +1,8 @@
-import type { Direction } from '../lib/pasaloo';
-import { ClockIcon } from './Icons';
-
-export interface HistoryItem {
-  src: string;
-  out: string;
-  dir: Direction;
-}
+'use client';
+import { Clock } from 'lucide-react';
+import type { HistoryItem } from '@/hooks/useHistory';
+import { Button } from '@/components/ui/button';
+import { useI18n } from '@/components/I18nProvider';
 
 interface Props {
   items: HistoryItem[];
@@ -13,17 +10,18 @@ interface Props {
   onClear: () => void;
 }
 
-export function History({ items, onRestore, onClear }: Props) {
+export function HistoryList({ items, onRestore, onClear }: Props) {
+  const { t } = useI18n();
   return (
     <section className="card col-hist" aria-labelledby="hist-title">
       <div className="card-head card-head--center">
         <h2 id="hist-title" className="with-icon">
-          <ClockIcon size={22} /> ประวัติล่าสุด
+          <Clock size={22} aria-hidden /> {t('hist_title')}
         </h2>
         {items.length > 0 && (
-          <button type="button" className="btn btn--text btn--sm" onClick={onClear}>
-            ล้างประวัติ
-          </button>
+          <Button variant="text" size="sm" onClick={onClear}>
+            {t('hist_clear')}
+          </Button>
         )}
       </div>
       {items.length ? (
@@ -32,7 +30,7 @@ export function History({ items, onRestore, onClear }: Props) {
             <li key={`${h.dir}:${h.src}`}>
               <button type="button" className="hist-item" onClick={() => onRestore(h)}>
                 <span className={`badge badge--sm ${h.dir === 'th2loo' ? 'badge--peach' : 'badge--lav'}`}>
-                  {h.dir === 'th2loo' ? 'ไทย → ลู' : 'ลู → ไทย'}
+                  {h.dir === 'th2loo' ? t('hist_th2loo') : t('hist_loo2th')}
                 </span>
                 <span className="hist-src">{h.src}</span>
                 <span className="hist-out">{h.out}</span>
@@ -42,8 +40,8 @@ export function History({ items, onRestore, onClear }: Props) {
         </ul>
       ) : (
         <div className="empty">
-          <strong>ยังไม่มีประวัติ</strong>
-          <span className="muted">คำที่แปลจะถูกเก็บไว้ตรงนี้ แตะเพื่อเรียกกลับมาได้</span>
+          <strong>{t('hist_empty_t')}</strong>
+          <span className="muted">{t('hist_empty_d')}</span>
         </div>
       )}
     </section>

@@ -1,39 +1,58 @@
 # ภาษาลู Translator 🤫
 
-แปลภาษาไทยเป็นภาษาลู และแปลกลับ แบบสด ๆ ขณะพิมพ์ — React + Vite + TypeScript
+Thai ⇄ ภาษาลู (Pasa Loo), live as you type. Next.js (App Router) + TypeScript + Tailwind v4 + shadcn/ui-style components. Everything runs client-side and exports as static HTML.
 
-- Live translation both ways, with a swap button
-- Syllable chips you can merge / split when the auto-split is wrong
-- Copy, Share, text-to-speech (Thai)
-- "How it works" card, Practice mode, recent history (saved in the browser)
-- Light / dark mode, responsive down to 360px
-
-## Run locally
+## Setup
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm test         # engine unit tests
-npm run build    # production build → dist/
+npm run dev        # http://localhost:3000
+npm test           # Vitest — engine unit tests
+npm run typecheck  # tsc --noEmit
+npm run build      # static export → out/
 ```
 
-## Deploy to Vercel via GitHub
+Stack: Next.js · Tailwind CSS v4 · shadcn/ui pattern (Radix + cva) · `next/font` (Prompt for headings, Noto Sans Thai for body) · next-themes · Motion · Sonner · lucide-react · Vitest. No backend, no external APIs.
 
-1. Create an empty repo on GitHub (e.g. `pasaloo-translator`), then from this folder:
-   ```bash
-   git remote add origin https://github.com/<you>/pasaloo-translator.git
-   git push -u origin main
-   ```
-2. On [vercel.com/new](https://vercel.com/new) → **Import Git Repository** → pick the repo.
-3. Vercel detects **Vite** automatically (Build: `npm run build`, Output: `dist`). Click **Deploy**.
+## Features
 
-Every push to `main` redeploys; pull requests get preview URLs.
+- Live translation (150 ms debounce) both ways, with a swap button
+- Syllable chips; tap one for a split / merge popover that overrides the automatic split. A typed `-` between Thai letters forces a split
+- Copy, Speak (Web Speech API, `th-TH`, detects whether a Thai voice exists), Share (`?t=<text>&d=th2loo|loo2th` link, native share sheet when available)
+- History in `localStorage` (max 20), Practice mode (3 difficulty levels from `src/lib/pasaloo/words.ts`)
+- TH / EN UI switch, light / dark mode, responsive from 390px to 1440px
 
-## Continue with Claude Code
+## How the engine works
 
-```bash
-cd pasaloo-translator
-claude
+`src/lib/pasaloo/` is pure TypeScript with no React or DOM imports.
+
+1. **segment.ts** normalizes text, splits Thai words with `Intl.Segmenter('th', { granularity: 'word' })`, then splits each word into syllables with rules. Non-Thai text, numbers, punctuation and spaces pass through untouched.
+2. **parse.ts** turns a syllable into `{ initial, vowel, final, toneMark }`; the initial can be a cluster (กร, ปล, คว) or ห / อ-led (หมา, อย่า). Silent letters (การันต์) are dropped.
+3. **tone.ts** knows consonant classes, live / dead syllables, the spoken tone, and which tone mark produces a given tone for a given class.
+4. **encode.ts** (Thai → ภาษาลู), per syllable:
+   - Part 1: initial → ล (ซ if the initial is already ล), vowel and final kept. ล is a low-class letter, so the tone mark is recomputed to keep the **spoken** tone. If ล can't make that tone (low / rising), it uses หล.
+   - Part 2: original initial + อู (อุ if the vowel is short) + original tone mark + final.
+5. **decode.ts** reads syllables in pairs: initial from Part 2, vowel and final from Part 1, tone mark from Part 2.
+6. **index.ts** exposes `translate(text, direction, segs?)` → `{ output, syllables: { text, uncertain }[], segs }`. A syllable is `uncertain` when the splitter couldn't parse it confidently; the UI marks it with a `?`.
+
+Examples: `ไป → ไลปู`, `กิน → ลินกุน`, `ข้าว → ล่าวขู้ว`, `ลา → ซาลู`, `หมา → หลาหมู`.
+
+## Project structure
+
+```
+src/app/            layout, page (translator), practice/, how-it-works/, opengraph-image.tsx
+src/components/     TranslatorPanel, SyllableChips, SwapButton, HistoryList, PracticeCard, HowItWorks, Header, ThemeToggle, ui/
+src/lib/pasaloo/    engine + words.ts (practice words)
+src/lib/i18n.ts     TH / EN dictionary
+src/hooks/          useHistory, useSpeech
 ```
 
-`CLAUDE.md` gives Claude Code the architecture, the ภาษาลู rules, and known limitations to work on.
+## Deploy to Vercel
+
+The app is a static export (`output: 'export'`), so no server or environment variables are needed.
+
+1. Push the repo to GitHub.
+2. On [vercel.com/new](https://vercel.com/new), import the repository. The Framework Preset is detected as **Next.js**; keep the defaults (Build: `npm run build`).
+3. Click **Deploy**. Every push to `main` redeploys; pull requests get preview URLs.
+
+Or with the CLI: `npx vercel` (preview) / `npx vercel --prod`.

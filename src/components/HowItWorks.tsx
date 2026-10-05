@@ -1,37 +1,31 @@
-import { EXAMPLES } from '../data/words';
-import { toLoo, tokenize } from '../lib/pasaloo';
-import { ArrowIcon } from './Icons';
+'use client';
+import { ArrowRight } from 'lucide-react';
+import { toLoo, translate } from '@/lib/pasaloo';
+import { EXAMPLES } from '@/lib/pasaloo/words';
+import { useI18n } from '@/components/I18nProvider';
 
 export function HowItWorks({ onTry }: { onTry: (word: string) => void }) {
+  const { t } = useI18n();
   return (
     <section className="card col-how" aria-labelledby="how-title">
-      <h2 id="how-title">ภาษาลูทำงานยังไง?</h2>
+      <div>
+        <h2 id="how-title">{t('how_title')}</h2>
+        <p className="muted mt-1">{t('how_sub')}</p>
+      </div>
       <div className="steps">
-        <div className="step step--mint">
-          <strong>ท่อนแรก</strong>
-          <span>เปลี่ยนพยัญชนะต้นเป็น ล สระ ตัวสะกด วรรณยุกต์เหมือนเดิม</span>
-        </div>
-        <div className="step step--lav">
-          <strong>ท่อนหลัง</strong>
-          <span>ใช้พยัญชนะต้นเดิม + สระอู (เสียงสั้นใช้ อุ) ตัวสะกดและวรรณยุกต์เหมือนเดิม</span>
-        </div>
-        <div className="step step--peach">
-          <strong>ขึ้นต้นด้วย ร หรือ ล?</strong>
-          <span>ท่อนแรกใช้ ซ แทน ล เช่น รัก → ซักรุก, ลม → ซมลุม</span>
-        </div>
-        <div className="step step--soft">
-          <strong>มีสระอุ / อู อยู่แล้ว?</strong>
-          <span>ท่อนแรกใช้ หล (ถ้าขึ้นต้นด้วย ร/ล ใช้ ซ) ท่อนหลังใช้ อี (สั้นใช้ อิ) เช่น หมู → หลูหมี, รู้ → ซู้รี้</span>
-        </div>
+        <div className="step step--mint"><strong>{t('step1_t')}</strong><span>{t('step1_d')}</span></div>
+        <div className="step step--lav"><strong>{t('step2_t')}</strong><span>{t('step2_d')}</span></div>
+        <div className="step step--peach"><strong>{t('step3_t')}</strong><span>{t('step3_d')}</span></div>
+        <div className="step step--soft"><strong>{t('step4_t')}</strong><span>{t('step4_d')}</span></div>
       </div>
       <div className="examples">
         {EXAMPLES.map((w) => (
-          <button key={w} type="button" className="example" aria-label={`ลองแปลคำว่า ${w}`} onClick={() => onTry(w)}>
+          <button key={w} type="button" className="example" aria-label={t('try_aria', { w })} onClick={() => onTry(w)}>
             <span className="example-word">{w}</span>
-            <ArrowIcon />
+            <ArrowRight size={20} aria-hidden />
             <span className="pills">
-              {tokenize(w)
-                .filter((g) => g.th)
+              {translate(w, 'th2loo')
+                .segs.filter((g) => g.th)
                 .map((g, i) => {
                   const [p1, p2] = toLoo(g.s);
                   return (
@@ -42,7 +36,7 @@ export function HowItWorks({ onTry }: { onTry: (word: string) => void }) {
                   );
                 })}
             </span>
-            <span className="example-try">ลองเลย</span>
+            <span className="example-try">{t('try')}</span>
           </button>
         ))}
       </div>

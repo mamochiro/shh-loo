@@ -1,45 +1,53 @@
 # CLAUDE.md — ภาษาลู Translator
 
 Playful web app that converts Thai text to ภาษาลู (Pasa Loo) and back, live as you type.
-React 18 + Vite 5 + TypeScript, no UI library, plain CSS with design tokens. Deployed on Vercel from GitHub.
+Next.js (App Router, static export) + TypeScript strict + Tailwind v4 + shadcn/ui-style components. Deployed on Vercel from GitHub. No backend.
 
 ## Commands
 
 - `npm install`
-- `npm run dev` — local dev server (http://localhost:5173)
-- `npm test` — Vitest unit tests for the translation engine (must stay green)
-- `npm run build` — type-check + production build to `dist/`
+- `npm run dev` — dev server (http://localhost:3000)
+- `npm test` — Vitest engine tests (must stay green)
+- `npm run typecheck`
+- `npm run build` — static export to `out/`
 
 ## Where things live
 
-- `src/lib/pasaloo.ts` — **the engine**. Pure functions, no DOM: `syllabify`, `parseSyllable`, `toLoo`, `fromPair`, `tokenize`, `convert`, `translate`, `mergeSegs`, `splitSeg`. All language rules are documented at the top of this file.
-- `src/lib/pasaloo.test.ts` — rule examples from public ภาษาลู guides + round-trip tests. Add a test case for every rule change or bug fix.
-- `src/lib/browser.ts` — clipboard, Web Share, speech synthesis (th-TH), safe localStorage.
-- `src/data/words.ts` — practice words and "How it works" examples.
-- `src/App.tsx` — page state (text, direction, edited syllables, tab, theme, history, toast).
-- `src/components/` — `SyllableChips`, `HowItWorks`, `History`, `Practice`, `Mascot`, `Icons`.
-- `src/styles.css` — tokens on `:root`, dark theme on `:root[data-theme='dark']`, responsive breakpoints at 860px and 560px.
+- `src/lib/pasaloo/` — **the engine**, pure TS, no React/DOM: `segment` (Intl.Segmenter words → rule-based syllables), `parse`, `tone`, `encode`, `decode`, `index` (`translate`). Tests live next to it; add a case for every rule change or bug fix.
+- `src/lib/pasaloo/words.ts` — practice words by syllable count.
+- `src/app/` — routes: `/` translator, `/practice`, `/how-it-works`, `opengraph-image.tsx`; `globals.css` holds design tokens (`:root`, `.dark`) mapped into Tailwind via `@theme inline`.
+- `src/components/` — TranslatorPanel (page state), SyllableChips, SwapButton, HistoryList, PracticeCard, HowItWorks, Header, ThemeToggle; `ui/` is shadcn-style (cva + Radix).
+- `src/hooks/` — `useHistory` (localStorage, max 20), `useSpeech` (th-TH, voice detection).
+- `src/lib/i18n.ts` — TH/EN dictionary; add every UI string to both languages.
 
-## ภาษาลู rules (implemented in `toLoo`)
+## ภาษาลู rules (implemented in `encode.ts` / `tone.ts`)
 
-1. Part 1: initial consonant → ล, keep vowel / final / tone mark. Part 2: original initial + อู (อุ if short) + tone mark + final. `กิน → ลินกุน`, `ข้าว → ล้าวขู้ว`
-2. Initial ร or ล → Part 1 uses ซ. `รัก → ซักรุก`, `ลม → ซมลุม`
-3. Vowel already อุ/อู → Part 1 uses หล, Part 2 uses อี/อิ. `หมู → หลูหมี`, `สุก → หลุกสิก`
-4. Rules 2 + 3 together → ซ for Part 1, อี/อิ for Part 2. `รู้ → ซู้รี้`
-5. Open syllables take อู unless spelled with ะ. `ไป → ไลปู`, `นะ → ละนุ`
+Per syllable:
 
-Reverse (ภาษาลู → Thai): pair syllables within a Thai run; original = Part 1 with its initial replaced by Part 2's initial.
+- Part 1: initial → ล (ซ if the initial is already ล); keep vowel and final; recompute the tone mark so the **spoken tone** is unchanged. ล is low-class, so when it can't make the tone (low / rising) use หล. `ข้าว → ล่าวขู้ว`, `หมา → หลาหมู`, `ลา → ซาลู`
+- Part 2: original initial + อู (อุ if short) + original tone mark + final. `กิน → ลินกุน`, `ไป → ไลปู`
+- Reverse: read syllables in pairs; initial from Part 2, vowel/final from Part 1, tone mark from Part 2.
+- Non-Thai text passes through; a typed `-` between Thai letters forces a syllable split.
 
-## Known limitations / good next tasks
+## Known limitations
 
-- Syllable splitting is rule-based, not dictionary-based: words with hidden vowels (สวัสดี → ส|วัส|ดี, ขนม) can split wrong. Users fix via chips. A dictionary-backed splitter (e.g. `Intl.Segmenter('th', { granularity: 'word' })` to find word boundaries first) would help.
-- Clusters (กร, ปล, คร) keep the 2nd consonant in Part 2 (`ปลา → ลาปลู`); sources don't specify.
-- Silent ย after ไ is kept (`ไทย → ไลยทู`).
+- Syllable splitting is rule-based; hidden-vowel words (สวัสดี, ขนม) can split wrong. Syllables the splitter is unsure about are flagged `uncertain`; users fix splits via the chips.
 - Speech uses the device's Thai voice; some desktops have none.
 
 ## Conventions
 
 - Keep the engine pure and fully tested; UI never re-implements rules.
-- Colors only via CSS variables; check both themes and 390px width for any UI change.
+- Colors only via the CSS variables / Tailwind theme tokens; check both themes and 390px width for any UI change.
 - Touch targets ≥ 44px, real `<button>`/`<label>`, `aria-label` on icon-only buttons.
-- UI copy is Thai.
+- UI copy is Thai by default with an English dictionary.
+- No random or localStorage reads during SSR/first render (static export hydration); load them in effects.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
