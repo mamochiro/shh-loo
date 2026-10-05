@@ -18,6 +18,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = storage.get<Lang | null>(LANG_KEY, null);
     if (saved === 'th' || saved === 'en') setLangState(saved);
+    else if (!navigator.language.toLowerCase().startsWith('th')) setLangState('en'); // first visit: follow the browser
   }, []);
   useEffect(() => {
     document.documentElement.lang = lang;
