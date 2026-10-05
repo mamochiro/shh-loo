@@ -37,8 +37,8 @@ export function syllabify(s: string, loo = false): string[] {
       continue;
     }
     const ini = i;
-    // ภาษาลู side: a part 1 starting with ซ is always followed by a part 2 starting with ล / หล,
-    // so ซูก|ลูก must not be read as ซู|กลูก
+    // ภาษาลู side: a part 1 starting with ซ is always followed by a part 2 starting with ร / ล / หร / หล,
+    // so ซูก|ลีก must not be read as ซู|กลีก
     const zi = loo && s[ini] === 'ซ';
     i++;
     if (clusterAt(s, ini, lead)) i++;
@@ -56,7 +56,7 @@ export function syllabify(s: string, loo = false): string[] {
         vm += c; i++; continue;
       }
       const needFin = !fin && /[ั็]$/.test(vm);
-      const loosePart2 = zi && !fin && c !== 'ล' && !(c === 'ห' && s[i + 1] === 'ล');
+      const loosePart2 = zi && !fin && c !== 'ล' && c !== 'ร' && !(c === 'ห' && (s[i + 1] === 'ล' || s[i + 1] === 'ร'));
       if (needFin ? isAttached(s[i + 1]) && s[i + 1] !== KARAN : startsNext(s, i) && !loosePart2) break;
       if (fin) break;
       if (c === 'ย' && lead === 'เ' && vm.includes('ี') && !vm.includes('ย')) { vm += c; i++; continue; }

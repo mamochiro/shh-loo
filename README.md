@@ -30,12 +30,12 @@ Stack: Next.js · Tailwind CSS v4 · shadcn/ui pattern (Radix + cva) · `next/fo
 2. **parse.ts** turns a syllable into `{ initial, vowel, final, toneMark }`; the initial can be a cluster (กร, ปล, คว) or ห / อ-led (หมา, อย่า). Silent letters (การันต์) are dropped.
 3. **tone.ts** knows consonant classes, live / dead syllables, the spoken tone, and which tone mark produces a given tone for a given class.
 4. **encode.ts** (Thai → ภาษาลู), per syllable:
-   - Part 1: initial → ล (ซ if the initial is already ล), vowel and final kept. ล is a low-class letter, so the tone mark is recomputed to keep the **spoken** tone. If ล can't make that tone (low / rising), it uses หล.
-   - Part 2: original initial + อู (อุ if the vowel is short) + original tone mark + final.
+   - Part 1: initial → ล, vowel and final kept; ร / ล initial → ซ; vowel already อุ / อู → หล. The tone mark is recomputed to keep the **spoken** tone (ล is low-class, so low / rising tones need หล; หล can't make mid / high, so those fall back to ล).
+   - Part 2: original initial + อู (อุ if the vowel is short) + original tone mark + final; อี / อิ when the vowel was already อู / อุ.
 5. **decode.ts** reads syllables in pairs: initial from Part 2, vowel and final from Part 1, tone mark from Part 2.
 6. **index.ts** exposes `translate(text, direction, segs?)` → `{ output, syllables: { text, uncertain }[], segs }`. A syllable is `uncertain` when the splitter couldn't parse it confidently; the UI marks it with a `?`.
 
-Examples: `ไป → ไลปู`, `กิน → ลินกุน`, `ข้าว → ล่าวขู้ว`, `ลา → ซาลู`, `หมา → หลาหมู`.
+Examples: `ไป → ไลปู`, `กิน → ลินกุน`, `ข้าว → ล่าวขู้ว`, `รัก → ซักรุก`, `ลา → ซาลู`, `หมา → หลาหมู`, `หมู → หลูหมี`.
 
 ## Project structure
 

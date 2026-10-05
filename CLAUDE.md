@@ -24,8 +24,8 @@ Next.js (App Router, static export) + TypeScript strict + Tailwind v4 + shadcn/u
 
 Per syllable:
 
-- Part 1: initial → ล (ซ if the initial is already ล); keep vowel and final; recompute the tone mark so the **spoken tone** is unchanged. ล is low-class, so when it can't make the tone (low / rising) use หล. `ข้าว → ล่าวขู้ว`, `หมา → หลาหมู`, `ลา → ซาลู`
-- Part 2: original initial + อู (อุ if short) + original tone mark + final. `กิน → ลินกุน`, `ไป → ไลปู`
+- Part 1: initial → ล; keep vowel and final; recompute the tone mark so the **spoken tone** is unchanged. ร / ล initial → ซ. Vowel already อุ/อู → หล. When หล/ล can't make the tone (ล is low-class: no low / rising; หล: no mid / high) the other letter is used. `ข้าว → ล่าวขู้ว`, `หมา → หลาหมู`, `รัก → ซักรุก`, `ลา → ซาลู`
+- Part 2: original initial + อู (อุ if short) + original tone mark + final; if the vowel was already อู / อุ use อี / อิ. `กิน → ลินกุน`, `ไป → ไลปู`, `หมู → หลูหมี`, `รู้ → ซู้รี้`
 - Reverse: read syllables in pairs; initial from Part 2, vowel/final from Part 1, tone mark from Part 2.
 - Non-Thai text passes through; a typed `-` between Thai letters forces a syllable split.
 
